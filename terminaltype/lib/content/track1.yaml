@@ -1,0 +1,413 @@
+id: track-1
+title: First Steps
+level: Beginner
+description: Never typed a command in your life? Start here. You'll learn to see, move, and touch files — the foundation of everything else.
+lessons:
+  - id: t1-l1
+    title: Say hello to the shell
+    tool: shell
+    world: fs
+    intro: |
+      Welcome to your terminal. Everything here happens by typing commands and pressing Enter.
+
+      The line with the blinking cursor is called the PROMPT. It looks like:
+
+        learner@terminaltype:~$
+
+      That "~" means you're in your home folder. Ready? First command: pwd.
+      It stands for "print working directory" — it shows where you are.
+    seed:
+      - op: touch
+        name: welcome.txt
+    exercises:
+      - id: ex1
+        prompt: "Type pwd and press Enter to see where you are."
+        accept:
+          - cmd: pwd
+            label: pwd
+        tips:
+          "cmd:pdw": Almost! You swapped two letters — it's pwd (print working directory).
+          "cmd:cd": cd changes your location. pwd *prints* it. Try pwd.
+        hint: pwd
+      - id: ex2
+        prompt: "Now type ls to list what's in this folder."
+        accept:
+          - cmd: ls
+            label: ls
+        tips:
+          "cmd:dir": dir is the Windows command — in this POSIX-flavored shell, use ls.
+          "cmd:sl": So close — the train has left the station. It's ls (lowercase L, lowercase s).
+        hint: ls
+      - id: ex3
+        prompt: "There's a file called welcome.txt. Read it with cat welcome.txt."
+        accept:
+          - cmd: cat
+            args: ["welcome.txt"]
+            label: cat welcome.txt
+        tips:
+          "cmd:cat noarg:welcome.txt": cat needs to know *which* file — add the filename after it.
+          "cmd:touch": touch creates empty files. cat *reads* them. Try cat welcome.txt.
+        hint: cat welcome.txt
+    badge: first-command
+
+  - id: t1-l2
+    title: Listing files like a pro
+    tool: ls
+    world: fs
+    intro: |
+      ls lists directory contents. It has FLAGS — options that start with a dash:
+
+        ls          plain listing
+        ls docs     list the "docs" folder without entering it
+        ls -a       also show HIDDEN files (they start with a dot)
+
+      In this folder there's a projects directory and a sneaky hidden file.
+    seed:
+      - op: mkdir
+        name: projects
+      - op: touch
+        name: todo.txt
+      - op: touch
+        name: .treasure
+        content: "X marks the spot. You found hidden files!"
+    exercises:
+      - id: ex1
+        prompt: "List the contents of the projects folder without leaving home: ls projects"
+        accept:
+          - cmd: ls
+            args: ["projects"]
+            label: ls projects
+          - cmd: ls
+            flags: [["-l"]]
+            args: ["projects"]
+            label: ls -l projects
+        tips:
+          "cmd:cd arg:projects": That works too, but you can peek into a folder without moving — try ls projects.
+        hint: ls projects
+      - id: ex2
+        prompt: "Hidden files start with a dot and are invisible to plain ls. Reveal them with ls -a"
+        accept:
+          - cmd: ls
+            flags: [["-a", "--all"]]
+            label: ls -a
+        tips:
+          "cmd:ls flag:-l": -l shows the long format with permissions — handy, but the flag you want here is -a (all).
+          "cmd:ls flag:-la": -la works — -l is the long format and -a includes hidden files. But plain ls -a is all this task needs. Try just ls -a.
+        hint: ls -a
+      - id: ex3
+        prompt: "You spotted .treasure. Read it with cat .treasure"
+        accept:
+          - cmd: cat
+            args: [".treasure"]
+            label: cat .treasure
+        hint: cat .treasure
+    badge: hidden-seeker
+
+  - id: t1-l3
+    title: Moving around with cd
+    tool: cd
+    world: fs
+    intro: |
+      cd changes your current directory ("change directory").
+
+        cd projects    go INTO the projects folder (relative path)
+        cd ..          go UP one level
+        cd ~           jump back to your home folder
+
+      Your home folder has a projects directory inside it.
+    seed:
+      - op: mkdir
+        name: projects
+      - op: mkdir
+        name: projects/web
+      - op: touch
+        name: projects/notes.md
+        content: notes from the projects folder
+    exercises:
+      - id: ex1
+        prompt: "Go into the projects folder: cd projects"
+        accept:
+          - cmd: cd
+            args: ["projects"]
+            label: cd projects
+        tips:
+          "cmd:cd noarg:projects": cd needs the folder name — try cd projects.
+          "cmd:ls": ls lists files, it doesn't move you. Use cd projects.
+        hint: cd projects
+      - id: ex2
+        prompt: "Check where you are now with pwd. Notice the path changed!"
+        accept:
+          - cmd: pwd
+            label: pwd
+        hint: pwd
+      - id: ex3
+        prompt: "Go back up one level with cd .."
+        accept:
+          - cmd: cd
+            args: [".."]
+            label: cd ..
+        tips:
+          "cmd:cd arg:~": "cd ~ jumps all the way home. Great shortcut, but this task wants the one-level-up move: cd .."
+        hint: cd ..
+      - id: ex4
+        prompt: "Now use an ABSOLUTE path to reach projects/web in one hop: cd /projects/web"
+        accept:
+          - cmd: cd
+            args: ["/projects/web"]
+            label: cd /projects/web
+        tips:
+          "cmd:cd arg:projects/web": "That's the relative path (two hops). Absolute paths start with a slash: cd /projects/web"
+        hint: cd /projects/web
+      - id: ex5
+        prompt: "Home time — jump back with cd ~"
+        accept:
+          - cmd: cd
+            args: ["~"]
+            label: cd ~
+          - cmd: cd
+            label: cd
+        hint: cd ~
+    badge: navigator
+
+  - id: t1-l4
+    title: Making things — mkdir & touch
+    tool: mkdir
+    world: fs
+    intro: |
+      You can create things from the terminal too:
+
+        mkdir <name>    makes a new directory (folder)
+        touch <name>    makes a new empty file
+
+      If mkdir says "File exists", that folder is already there — the terminal never destroys things silently.
+    exercises:
+      - id: ex1
+        prompt: "Create a folder called websites: mkdir websites"
+        accept:
+          - cmd: mkdir
+            args: ["websites"]
+            label: mkdir websites
+        tips:
+          "cmd:touch arg:websites": touch makes FILES. For a folder, use mkdir websites.
+        hint: mkdir websites
+      - id: ex2
+        prompt: "Create an empty file called ideas.txt: touch ideas.txt"
+        accept:
+          - cmd: touch
+            args: ["ideas.txt"]
+            label: touch ideas.txt
+        tips:
+          "cmd:mkdir arg:ideas.txt": mkdir makes FOLDERS. For a file, use touch ideas.txt.
+        hint: touch ideas.txt
+      - id: ex3
+        prompt: "Verify both exist with ls"
+        accept:
+          - cmd: ls
+            label: ls
+        hint: ls
+      - id: ex4
+        prompt: "Cleanup time — delete ideas.txt with rm ideas.txt"
+        accept:
+          - cmd: rm
+            args: ["ideas.txt"]
+            label: rm ideas.txt
+        tips:
+          "cmd:rm arg:websites": websites is a folder — rm needs -r for those. But this task only asks you to delete the FILE ideas.txt.
+        hint: rm ideas.txt
+    badge: maker
+
+  - id: t1-l5
+    title: Reading files with cat
+    tool: cat
+    world: fs
+    intro: |
+      cat prints a file's contents to the terminal.
+
+        cat <file>              read one file
+        cat <file1> <file2>     read several in order
+
+      Careful: cat on a folder says "Is a directory" — it only reads files.
+    seed:
+      - op: write
+        name: chapter1.txt
+        content: "It was a dark and stormy night in the terminal..."
+      - op: write
+        name: chapter2.txt
+        content: "Suddenly, the prompt blinked twice. The end."
+    exercises:
+      - id: ex1
+        prompt: "Read chapter1.txt"
+        accept:
+          - cmd: cat
+            args: ["chapter1.txt"]
+            label: cat chapter1.txt
+        hint: cat chapter1.txt
+      - id: ex2
+        prompt: "Read chapter2.txt"
+        accept:
+          - cmd: cat
+            args: ["chapter2.txt"]
+            label: cat chapter2.txt
+        hint: cat chapter2.txt
+      - id: ex3
+        prompt: "Bonus — read BOTH with one command: cat chapter1.txt chapter2.txt"
+        accept:
+          - cmd: cat
+            args: ["chapter1.txt", "chapter2.txt"]
+            label: cat chapter1.txt chapter2.txt
+        hint: cat chapter1.txt chapter2.txt
+    badge: reader
+
+  - id: t1-l6
+    title: Paths — where am I, where is it
+    tool: paths
+    world: fs
+    intro: |
+      Two ways to name locations:
+
+        RELATIVE:  from where you stand now     (docs/notes.txt)
+        ABSOLUTE:  from the root, starts with / (/home/learner/docs/notes.txt)
+
+      pwd prints where you are. combine with cd .. to climb.
+    seed:
+      - op: mkdir
+        name: docs
+      - op: write
+        path: docs
+        name: notes.txt
+        content: "Relative paths are measured from the current directory."
+      - op: mkdir
+        name: docs/archive
+    exercises:
+      - id: ex1
+        prompt: "Enter the docs folder: cd docs"
+        accept:
+          - cmd: cd
+            args: ["docs"]
+            label: cd docs
+        tips:
+          "cmd:ls": ls lists files but doesn't move you — cd docs is the mover.
+        hint: cd docs
+      - id: ex2
+        prompt: "Now check where you are with pwd — see the /docs at the end?"
+        accept:
+          - cmd: pwd
+            label: pwd
+        hint: pwd
+      - id: ex3
+        prompt: "From inside docs, read notes.txt using a RELATIVE path: cat notes.txt"
+        accept:
+          - cmd: cat
+            args: ["notes.txt"]
+            label: cat notes.txt
+        hint: cat notes.txt
+      - id: ex4
+        prompt: "Now climb out with cd .. and read the same file ABSOLUTELY: cat /docs/notes.txt"
+        accept:
+          - cmd: cat
+            args: ["/docs/notes.txt"]
+            label: cat /docs/notes.txt
+        hint: cd .. then cat /docs/notes.txt
+    badge: pathfinder
+
+  - id: t1-l7
+    title: Chain of power — combining commands
+    tool: shell
+    world: fs
+    intro: |
+      Real workflows chain what you've learned. A taste of the pattern:
+
+        mkdir site
+        touch site/index.html
+
+      One command per line, each building on the last.
+    exercises:
+      - id: ex1
+        prompt: "Make a folder called site"
+        accept:
+          - cmd: mkdir
+            args: ["site"]
+            label: mkdir site
+        hint: mkdir site
+      - id: ex2
+        prompt: "Inside site, create index.html — either cd in first, or touch site/index.html directly"
+        accept:
+          - cmd: touch
+            args: ["site/index.html"]
+            label: touch site/index.html
+          - cmd: touch
+            args: ["site", "index.html"]
+            label: touch site/index.html
+        tips:
+          "cmd:touch arg:index.html": "touch index.html would create it HERE. Add the folder: touch site/index.html"
+        hint: touch site/index.html
+      - id: ex3
+        prompt: "Confirm the file is there: ls site"
+        accept:
+          - cmd: ls
+            args: ["site"]
+            label: ls site
+        hint: ls site
+    badge: builder
+
+  - id: t1-l8
+    title: BOSS — The hidden treasure
+    tool: shell
+    world: fs
+    boss: true
+    intro: |
+      FINAL CHALLENGE of Track 1. Somewhere in this filesystem hides a secret file.
+
+      Your toolkit: ls -a (reveal hidden), cd (move), cat (read).
+
+      No step-by-step this time. Trust the prompt, young one.
+    seed:
+      - op: mkdir
+        name: work
+      - op: mkdir
+        name: work/deep
+      - op: mkdir
+        name: work/deep/deeper
+      - op: write
+        path: work/deep/deeper
+        name: .secret
+        content: "🏆 You found the hidden treasure. Track 1 complete — you officially know your way around a terminal."
+      - op: write
+        path: work
+        name: readme.txt
+        content: "The secret is deeper. And hidden. And starts with a dot."
+      - op: touch
+        name: decoy.txt
+    exercises:
+      - id: ex1
+        prompt: "Explore and locate the hidden file inside work/deep/deeper"
+        accept:
+          - cmd: ls
+            flags: [["-a", "--all"]]
+            args: ["/work/deep/deeper"]
+            label: ls -a /work/deep/deeper
+          - cmd: ls
+            flags: [["-a", "--all"]]
+            args: ["work/deep/deeper"]
+            label: ls -a work/deep/deeper
+        tips:
+          "cmd:find": find is a real command but not taught yet — explore with ls -a and cd.
+          "cmd:ls noflag:-a": Plain ls won't show hidden files. Add -a.
+        hint: cd work, then ls -a, and keep going deeper
+      - id: ex2
+        prompt: "Reveal the secret — cat the hidden file you found."
+        accept:
+          - cmd: cat
+            args: [".secret"]
+            label: cat .secret
+            canonical: "cat work/deep/deeper/.secret"
+          - cmd: cat
+            args: ["work/deep/deeper/.secret"]
+            label: cat work/deep/deeper/.secret
+          - cmd: cat
+            args: ["/work/deep/deeper/.secret"]
+            label: cat /work/deep/deeper/.secret
+        tips:
+          "cmd:cat arg:decoy.txt": That's a decoy! The real file starts with a dot.
+        hint: from anywhere — cat /work/deep/deeper/.secret
+    badge: track-1-champion

@@ -1,0 +1,495 @@
+id: track-3
+title: Ops & Media
+level: Advanced
+description: Containers, clusters, and media processing — the heavy artillery of the command line.
+lessons:
+  - id: t3-l1
+    title: docker run — boxes for your code
+    tool: docker
+    world: docker
+    intro: |
+      A container packages code + dependencies so it runs identically everywhere.
+
+        docker run <image>       start a container from an image
+        docker ps                list RUNNING containers
+        docker ps -a             include stopped ones
+
+      An image is the recipe; a container is the dish.
+    seed:
+      - op: dockerImage
+        image: nginx
+        tag: latest
+        size: "77MB"
+      - op: dockerContainer
+        image: nginx
+        cname: web-server
+        ports: "80/tcp"
+    exercises:
+      - id: ex1
+        prompt: "See what's running: docker ps"
+        accept:
+          - cmd: docker
+            args: ["ps"]
+            label: docker ps
+        tips:
+          "cmd:docker sub:ps flag:-a": -a shows stopped containers too — but this task just wants docker ps.
+        hint: docker ps
+      - id: ex2
+        prompt: "Start another container from the nginx image: docker run nginx"
+        accept:
+          - cmd: docker
+            args: ["run", "nginx"]
+            label: docker run nginx
+        hint: docker run nginx
+      - id: ex3
+        prompt: "Two containers should be running now — check with docker ps"
+        accept:
+          - cmd: docker
+            args: ["ps"]
+            label: docker ps
+        hint: docker ps
+    badge: container-starter
+
+  - id: t3-l2
+    title: docker build — craft your own image
+    tool: docker
+    world: docker
+    intro: |
+      Your own apps become images with a Dockerfile — a recipe with steps:
+
+        FROM node:20-alpine     base image
+        COPY . .                copy your code in
+        RUN npm install         install dependencies
+        CMD ["npm", "start"]    command to run
+
+      Build it: docker build -t <name> .
+      -t names the image, the dot means "build from here".
+    exercises:
+      - id: ex1
+        prompt: "Look at the Dockerfile in this folder: cat Dockerfile"
+        accept:
+          - cmd: cat
+            args: ["Dockerfile"]
+            label: cat Dockerfile
+        hint: cat Dockerfile
+      - id: ex2
+        prompt: "Build it into an image called my-app: docker build -t my-app ."
+        accept:
+          - cmd: docker
+            args: ["build", "*"]
+            canonical: "docker build -t app ."
+            flags: [["-t"]]
+            label: docker build -t my-app .
+        tips:
+          "cmd:docker sub:build noarg:.": "docker build needs a context path — end your command with a dot: docker build -t my-app ."
+          "cmd:docker sub:build noflag:-t": "give your image a name with -t: docker build -t my-app ."
+        hint: docker build -t my-app .
+      - id: ex3
+        prompt: "List images to see your creation: docker images"
+        accept:
+          - cmd: docker
+            args: ["images"]
+            label: docker images
+        hint: docker images
+    badge: image-smith
+
+  - id: t3-l3
+    title: docker logs — what's it saying
+    tool: docker
+    world: docker
+    intro: |
+      Containers run in the background — their output goes to logs:
+
+        docker logs <container>     read its output
+        docker ps                   remind yourself of names
+
+      The web-server container is chatty. Let's listen.
+    seed:
+      - op: dockerContainer
+        image: nginx
+        cname: web-server
+        ports: "80/tcp"
+    exercises:
+      - id: ex1
+        prompt: "Find the container name with docker ps"
+        accept:
+          - cmd: docker
+            args: ["ps"]
+            label: docker ps
+        hint: docker ps
+      - id: ex2
+        prompt: "Read its logs: docker logs web-server"
+        accept:
+          - cmd: docker
+            args: ["logs", "web-server"]
+            label: docker logs web-server
+        tips:
+          "cmd:docker sub:logs noarg:web-server": "docker logs needs the container name: docker logs web-server"
+        hint: docker logs web-server
+    badge: log-whisperer
+
+  - id: t3-l4
+    title: BOSS — Containerize the app
+    tool: docker
+    world: docker
+    boss: true
+    intro: |
+      BOSS: full container lifecycle. The Dockerfile is ready.
+
+      1. read the Dockerfile
+      2. build an image tagged shop-api
+      3. verify it in docker images
+      4. run a container from it
+      5. check the logs
+    exercises:
+      - id: ex1
+        prompt: "Step 1 — inspect the recipe"
+        accept:
+          - cmd: cat
+            args: ["Dockerfile"]
+            label: cat Dockerfile
+        hint: cat Dockerfile
+      - id: ex2
+        prompt: "Step 2 — build image shop-api"
+        accept:
+          - cmd: docker
+            args: ["build", "*"]
+            canonical: "docker build -t shop-api ."
+            flags: [["-t"]]
+            label: docker build -t shop-api .
+        hint: docker build -t shop-api .
+      - id: ex3
+        prompt: "Step 3 — confirm the image exists"
+        accept:
+          - cmd: docker
+            args: ["images"]
+            label: docker images
+        hint: docker images
+      - id: ex4
+        prompt: "Step 4 — run a container from shop-api"
+        accept:
+          - cmd: docker
+            args: ["run", "shop-api"]
+            label: docker run shop-api
+        hint: docker run shop-api
+      - id: ex5
+        prompt: "Step 5 — find the container name, then read its logs"
+        accept:
+          - cmd: docker
+            args: ["logs", "sandbox-container"]
+            label: docker logs <name>
+        tips:
+          "cmd:docker sub:logs": grab the exact container name from docker ps first.
+        hint: docker ps, then docker logs <name>
+    badge: container-champion
+
+  - id: t3-l5
+    title: kubectl get — see the cluster
+    tool: kubectl
+    world: k8s
+    intro: |
+      Kubernetes runs containers across many machines. kubectl talks to the cluster:
+
+        kubectl get pods       list pods (smallest units)
+        kubectl get deploy     list deployments
+        kubectl get svc        list services
+
+      A POD wraps your container. A DEPLOYMENT keeps N of them alive.
+    seed:
+      - op: k8sPod
+        name: web-app-7d9f8
+        image: web-app:latest
+      - op: k8sPod
+        name: web-app-2m4x1
+        image: web-app:latest
+      - op: k8sPod
+        name: queue-worker-8sd2
+        image: worker:2.1
+    exercises:
+      - id: ex1
+        prompt: "List the pods: kubectl get pods"
+        accept:
+          - cmd: kubectl
+            args: ["get", "pods"]
+            label: kubectl get pods
+          - cmd: kubectl
+            args: ["get", "po"]
+            label: kubectl get po
+        tips:
+          "cmd:kubectl arg:get": order — kubectl get pods. get first, then the resource.
+        hint: kubectl get pods
+      - id: ex2
+        prompt: "Which pod is running the worker image? Check the IMAGE column, then get pods again if you need."
+        accept:
+          - cmd: kubectl
+            args: ["get", "pods"]
+            label: kubectl get pods
+        hint: kubectl get pods
+    badge: cluster-eyes
+
+  - id: t3-l6
+    title: kubectl apply — declare your state
+    tool: kubectl
+    world: k8s
+    intro: |
+      You don't tell Kubernetes what to do — you declare what you WANT:
+
+        kubectl apply -f deployment.yaml
+
+      The cluster reads the YAML and makes reality match. If a pod dies,
+      the deployment replaces it. That's "reconciliation".
+    exercises:
+      - id: ex1
+        prompt: "Read the deployment.yaml first"
+        accept:
+          - cmd: cat
+            args: ["deployment.yaml"]
+            label: cat deployment.yaml
+        hint: cat deployment.yaml
+      - id: ex2
+        prompt: "Apply it: kubectl apply -f deployment.yaml"
+        accept:
+          - cmd: kubectl
+            args: ["apply", "*"]
+            canonical: "kubectl apply -f deployment.yaml"
+            flags: [["-f", "--filename"]]
+            label: kubectl apply -f deployment.yaml
+        tips:
+          "cmd:kubectl sub:apply noflag:-f": "kubectl apply needs the file flag: kubectl apply -f deployment.yaml"
+        hint: kubectl apply -f deployment.yaml
+      - id: ex3
+        prompt: "The deployment spawned pods — see them: kubectl get pods"
+        accept:
+          - cmd: kubectl
+            args: ["get", "pods"]
+            label: kubectl get pods
+        hint: kubectl get pods
+    badge: declarer
+
+  - id: t3-l7
+    title: kubectl logs & describe — debug pods
+    tool: kubectl
+    world: k8s
+    intro: |
+      When a pod misbehaves:
+
+        kubectl logs <pod>          its output
+        kubectl describe pod <pod>  events, images, restarts — everything
+
+      One pod here is stuck in CrashLoopBackOff. Classic.
+    seed:
+      - op: k8sPod
+        name: web-app-7d9f8
+        image: web-app:latest
+      - op: k8sPod
+        name: worker-9s2k1
+        image: worker:2.1
+        kstatus: CrashLoopBackOff
+        restarts: 14
+        ready: "0/1"
+    exercises:
+      - id: ex1
+        prompt: "Find the unhappy pod (look at STATUS)"
+        accept:
+          - cmd: kubectl
+            args: ["get", "pods"]
+            label: kubectl get pods
+        hint: kubectl get pods
+      - id: ex2
+        prompt: "Interrogate it: kubectl describe pod worker-9s2k1"
+        accept:
+          - cmd: kubectl
+            args: ["describe", "pod", "worker-9s2k1"]
+            label: kubectl describe pod worker-9s2k1
+        hint: kubectl describe pod worker-9s2k1
+      - id: ex3
+        prompt: "Read its logs"
+        accept:
+          - cmd: kubectl
+            args: ["logs", "worker-9s2k1"]
+            label: kubectl logs worker-9s2k1
+        hint: kubectl logs worker-9s2k1
+    badge: pod-doctor
+
+  - id: t3-l8
+    title: BOSS — Deploy to the cluster
+    tool: kubectl
+    world: k8s
+    boss: true
+    intro: |
+      FINAL BOSS of Track 3: a full deployment, start to finish.
+
+      1. read deployment.yaml
+      2. apply it
+      3. verify pods are Running
+      4. expose it with service.yaml
+      5. verify services
+    seed:
+      - op: write
+        name: service.yaml
+        content: "apiVersion: v1\nkind: Service\nmetadata:\n  name: web-app-svc\nspec:\n  ports:\n    - port: 80\n"
+      - op: write
+        name: deployment.yaml
+        content: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-app\nspec:\n  replicas: 3\n  template:\n    spec:\n      containers:\n        - name: web\n          image: web-app:latest\n"
+    exercises:
+      - id: ex1
+        prompt: "Step 1 — read deployment.yaml"
+        accept:
+          - cmd: cat
+            args: ["deployment.yaml"]
+            label: cat deployment.yaml
+        hint: cat deployment.yaml
+      - id: ex2
+        prompt: "Step 2 — apply it"
+        accept:
+          - cmd: kubectl
+            args: ["apply", "*"]
+            canonical: "kubectl apply -f deployment.yaml"
+            flags: [["-f", "--filename"]]
+            label: kubectl apply -f deployment.yaml
+        hint: kubectl apply -f deployment.yaml
+      - id: ex3
+        prompt: "Step 3 — verify the pods"
+        accept:
+          - cmd: kubectl
+            args: ["get", "pods"]
+            label: kubectl get pods
+        hint: kubectl get pods
+      - id: ex4
+        prompt: "Step 4 — apply service.yaml"
+        accept:
+          - cmd: kubectl
+            args: ["apply", "*"]
+            canonical: "kubectl apply -f service.yaml"
+            flags: [["-f", "--filename"]]
+            label: kubectl apply -f service.yaml
+        hint: kubectl apply -f service.yaml
+      - id: ex5
+        prompt: "Step 5 — verify the service"
+        accept:
+          - cmd: kubectl
+            args: ["get", "svc"]
+            label: kubectl get svc
+          - cmd: kubectl
+            args: ["get", "services"]
+            label: kubectl get services
+        hint: kubectl get svc
+    badge: k8s-captain
+
+  - id: t3-l9
+    title: ffmpeg — transcode anything
+    tool: ffmpeg
+    world: ffmpeg
+    intro: |
+      ffmpeg converts, trims, and compresses audio/video. The pattern:
+
+        ffmpeg -i INPUT OUTPUT
+
+      -i marks the input; the output's extension sets the format.
+      video.mp4 is sitting there. Make it a .webm.
+    exercises:
+      - id: ex1
+        prompt: "Convert video.mp4 to webm: ffmpeg -i video.mp4 video.webm"
+        accept:
+          - cmd: ffmpeg
+            args: ["video.mp4", "video.webm"]
+            label: ffmpeg -i video.mp4 video.webm
+        tips:
+          "cmd:ffmpeg sub:convert": "ffmpeg has no convert subcommand — the magic is in the flags: ffmpeg -i in.mp4 out.webm"
+        hint: ffmpeg -i video.mp4 video.webm
+      - id: ex2
+        prompt: "Check it worked — list files and look for video.webm"
+        accept:
+          - cmd: ls
+            label: ls
+        hint: ls
+    badge: transcoder
+
+  - id: t3-l10
+    title: ffmpeg — extract audio
+    tool: ffmpeg
+    world: ffmpeg
+    intro: |
+      The -vn flag means "no video" — audio only:
+
+        ffmpeg -i video.mp4 -vn soundtrack.mp3
+
+      Extracting audio is one of ffmpeg's most-used tricks.
+    seed:
+      - op: write
+        name: movie.mp4
+        content: "VIDEO 3840x2160 7200s AUDIO 48000Hz"
+    exercises:
+      - id: ex1
+        prompt: "Pull the audio out of movie.mp4 into soundtrack.mp3"
+        accept:
+          - cmd: ffmpeg
+            args: ["movie.mp4", "soundtrack.mp3"]
+            label: ffmpeg -i movie.mp4 -vn soundtrack.mp3
+        tips:
+          "cmd:ffmpeg": "put -vn between input and output: ffmpeg -i movie.mp4 -vn soundtrack.mp3"
+        hint: ffmpeg -i movie.mp4 -vn soundtrack.mp3
+    badge: audio-extractor
+
+  - id: t3-l11
+    title: ffmpeg — trim the clip
+    tool: ffmpeg
+    world: ffmpeg
+    intro: |
+      Cut a slice out of media:
+
+        ffmpeg -ss 00:00:10 -i in.mp4 -t 5 out.mp4
+
+      -ss = start time, -t = duration in seconds.
+      This grabs 5 seconds starting at the 10-second mark.
+    seed:
+      - op: write
+        name: stream.mp4
+        content: "VIDEO 1920x1080 3600s"
+    exercises:
+      - id: ex1
+        prompt: "Cut 5 seconds from stream.mp4 starting at 10s into clip.mp4"
+        accept:
+          - cmd: ffmpeg
+            args: ["stream.mp4", "clip.mp4"]
+            label: ffmpeg -ss 00:00:10 -i stream.mp4 -t 5 clip.mp4
+        hint: ffmpeg -ss 00:00:10 -i stream.mp4 -t 5 clip.mp4
+    badge: clipper
+
+  - id: t3-l12
+    title: BOSS — The media pipeline
+    tool: ffmpeg
+    world: ffmpeg
+    boss: true
+    intro: |
+      BOSS: a real media pipeline in three commands.
+
+      1. convert episode.mp4 to episode.webm (smaller for web)
+      2. extract its audio to episode.mp3
+      3. list files to confirm everything exists
+    seed:
+      - op: write
+        name: episode.mp4
+        content: "VIDEO 1920x1080 1800s AUDIO 48000Hz"
+    exercises:
+      - id: ex1
+        prompt: "Step 1 — convert to webm"
+        accept:
+          - cmd: ffmpeg
+            args: ["episode.mp4", "episode.webm"]
+            label: ffmpeg -i episode.mp4 episode.webm
+        hint: ffmpeg -i episode.mp4 episode.webm
+      - id: ex2
+        prompt: "Step 2 — extract the audio"
+        accept:
+          - cmd: ffmpeg
+            args: ["episode.mp4", "episode.mp3"]
+            label: ffmpeg -i episode.mp4 -vn episode.mp3
+        hint: ffmpeg -i episode.mp4 -vn episode.mp3
+      - id: ex3
+        prompt: "Step 3 — confirm your outputs"
+        accept:
+          - cmd: ls
+            label: ls
+        hint: ls
+    badge: media-wizard

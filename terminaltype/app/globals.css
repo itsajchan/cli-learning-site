@@ -1,0 +1,246 @@
+:root {
+  --bg: #0a0e14;
+  --fg: #e6e6e6;
+  --green: #4af626;
+  --amber: #ffb648;
+  --red: #ff5c57;
+  --cyan: #57c7ff;
+  --dim: #6b7280;
+  --accent: #4af626;
+  --selection: #1f2937;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+body {
+  font-family: var(--font-mono), "JetBrains Mono", "IBM Plex Mono", monospace;
+  overflow: hidden;
+}
+
+.terminal-root {
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono), "JetBrains Mono", "IBM Plex Mono", monospace;
+  font-size: 15px;
+  line-height: 1.55;
+  position: relative;
+  transition: filter 0.15s ease;
+}
+
+.terminal-root[data-flash="true"] {
+  filter: brightness(1.6);
+}
+
+.scanlines {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 3px,
+    transparent 4px
+  );
+  mix-blend-mode: multiply;
+  z-index: 10;
+}
+
+.terminal-root[data-reduced] .scanlines {
+  display: none;
+}
+
+.scrollback {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 16px 20px 40vh 20px;
+  z-index: 1;
+  cursor: text;
+}
+
+.tl {
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1em;
+}
+
+/* color classes driven by theme vars */
+.c-text { color: var(--fg); }
+.c-dim { color: var(--dim); }
+.c-command { color: var(--fg); font-weight: 600; }
+.c-flag { color: var(--cyan); }
+.c-string { color: var(--green); }
+.c-error { color: var(--red); }
+.c-success { color: var(--green); }
+.c-warning { color: var(--amber); }
+.c-accent { color: var(--accent); font-weight: 600; }
+.c-prompt { color: var(--accent); user-select: none; }
+.c-path { color: var(--cyan); }
+
+/* input */
+.input-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.input-wrap {
+  position: relative;
+  flex: 1;
+  display: inline-block;
+}
+
+.input-wrap input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font: inherit;
+  width: 100%;
+  caret-color: var(--green);
+  animation: blink-caret 1.05s steps(1) infinite;
+}
+
+@keyframes blink-caret {
+  0%, 49% { caret-color: var(--green); }
+  50%, 100% { caret-color: transparent; }
+}
+
+.terminal-root[data-reduced] .input-wrap input {
+  animation: none;
+}
+
+.ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--dim);
+  opacity: 0.55;
+  pointer-events: none;
+  white-space: pre;
+}
+
+/* lesson intro + task banner */
+.lesson-intro {
+  margin-top: 4px;
+}
+
+.task-banner {
+  padding: 2px 0;
+}
+
+/* boot typewriter */
+.scrollback .tl {
+  animation: fade-in 0.12s ease;
+}
+
+.terminal-root[data-reduced] .scrollback .tl {
+  animation: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+/* palette (Ctrl+K) */
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+
+.palette {
+  width: min(640px, 92vw);
+  background: var(--bg);
+  border: 1px solid var(--dim);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 12px color-mix(in srgb, var(--green) 25%, transparent);
+}
+
+.palette-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--dim);
+}
+
+.palette-head input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font: inherit;
+}
+
+.palette-list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.palette-item {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.palette-item.selected {
+  background: var(--selection);
+}
+
+.palette-tool {
+  margin-left: auto;
+}
+
+.palette-empty {
+  padding: 12px;
+}
+
+/* scrollbar styling */
+.scrollback::-webkit-scrollbar,
+.palette-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollback::-webkit-scrollbar-thumb,
+.palette-list::-webkit-scrollbar-thumb {
+  background: var(--dim);
+  border-radius: 4px;
+}
+
+.scrollback::-webkit-scrollbar-track,
+.palette-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollback .tl { animation: none; }
+  .input-wrap input { animation: none; }
+}

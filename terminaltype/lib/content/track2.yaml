@@ -1,0 +1,627 @@
+id: track-2
+title: Everyday Power
+level: Intermediate
+description: The tools you'll touch every single day — git version control, grep searching, and npm package management.
+lessons:
+  - id: t2-l1
+    title: git init — start tracking
+    tool: git
+    world: git
+    intro: |
+      git records the history of your project so you can rewind, branch, and collaborate.
+
+      Everything starts the same way:
+
+        git init
+
+      This creates a hidden .git folder — the "time machine".
+    exercises:
+      - id: ex1
+        prompt: "Turn this folder into a git repository: git init"
+        accept:
+          - cmd: git
+            args: ["init"]
+            label: git init
+        tips:
+          "cmd:git arg:start": Cute, but the command is git init (initialize).
+          "cmd:git sub:install": git isn't installed per-project — git init is what you want.
+        hint: git init
+      - id: ex2
+        prompt: "Ask git what's going on: git status"
+        accept:
+          - cmd: git
+            args: ["status"]
+            label: git status
+        tips:
+          "cmd:git sub:statu": Typo! git status.
+        hint: git status
+    badge: git-born
+
+  - id: t2-l2
+    title: git status — read the room
+    tool: git
+    world: git
+    intro: |
+      git status is your dashboard. It tells you:
+
+        Untracked files   — new files git isn't watching yet
+        Modified files    — watched files you've changed
+        Staged changes    — files ready to be committed
+
+      There's a modified file in this repo. Let's find it.
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+      - op: touch
+        name: app.js
+    exercises:
+      - id: ex1
+        prompt: "Run git status and find the modified file."
+        accept:
+          - cmd: git
+            args: ["status"]
+            label: git status
+        hint: git status
+      - id: ex2
+        prompt: "See WHAT changed in README.md with git diff"
+        accept:
+          - cmd: git
+            args: ["diff"]
+            label: git diff
+        hint: git diff
+    badge: status-reader
+
+  - id: t2-l3
+    title: git add — stage your work
+    tool: git
+    world: git
+    intro: |
+      Before committing, you STAGE changes — pick exactly what goes into the next save:
+
+        git add <file>    stage one file
+        git add .         stage everything
+
+      Think of staging as packing a box. The commit ships the box.
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+      - op: touch
+        name: app.js
+    exercises:
+      - id: ex1
+        prompt: "Stage the modified README.md: git add README.md"
+        accept:
+          - cmd: git
+            args: ["add", "README.md"]
+            label: git add README.md
+        tips:
+          "cmd:git sub:add noarg:README.md": "git add needs the filename: git add README.md"
+          "cmd:git sub:stage": close — staging is done with git add.
+        hint: git add README.md
+      - id: ex2
+        prompt: "Check status — README.md should now be under \"Changes to be committed\"."
+        accept:
+          - cmd: git
+            args: ["status"]
+            label: git status
+        hint: git status
+      - id: ex3
+        prompt: "Stage everything remaining: git add ."
+        accept:
+          - cmd: git
+            args: ["add", "."]
+            label: git add .
+          - cmd: git
+            args: ["add", "-A"]
+            label: git add -A
+        hint: git add .
+    badge: stage-master
+
+  - id: t2-l4
+    title: git commit — save the game
+    tool: git
+    world: git
+    intro: |
+      A commit is a snapshot — a save point you can return to.
+
+        git commit -m "message"
+
+      The -m flag passes the message inline. Without it, git opens an editor.
+      Good messages say WHAT and WHY: "fix login redirect bug", not "changes".
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+    exercises:
+      - id: ex1
+        prompt: "Stage README.md first (git add README.md), then commit with git commit -m \"your message\""
+        accept:
+          - cmd: git
+            args: ["commit", "*"]
+            flags: [["-m"]]
+            canonical: "git add . && git commit -m msg"
+            label: git commit -m "..."
+        tips:
+          "cmd:git sub:commit noflag:-m": git without -m tries to open an editor — always use -m with a message.
+        hint: git add README.md, then git commit -m "message"
+      - id: ex2
+        prompt: "Confirm with git status — working tree should be clean."
+        accept:
+          - cmd: git
+            args: ["status"]
+            label: git status
+        hint: git status
+      - id: ex3
+        prompt: "Time travel check — view history with git log"
+        accept:
+          - cmd: git
+            args: ["log"]
+            label: git log
+        hint: git log
+    badge: committer
+
+  - id: t2-l5
+    title: git branch — parallel universes
+    tool: git
+    world: git
+    intro: |
+      Branches let you work on features without breaking the main code.
+
+        git branch <name>      create a branch
+        git branch             list branches (* = where you are)
+        git switch <name>      move to a branch (modern command)
+        git checkout -b <n>    create AND move (classic command)
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+    exercises:
+      - id: ex1
+        prompt: "Create a branch called feature/login: git branch feature/login"
+        accept:
+          - cmd: git
+            args: ["branch", "feature/login"]
+            label: git branch feature/login
+        hint: git branch feature/login
+      - id: ex2
+        prompt: "List branches — you should still be on main."
+        accept:
+          - cmd: git
+            args: ["branch"]
+            label: git branch
+        hint: git branch
+      - id: ex3
+        prompt: "Switch to it: git switch feature/login (or git checkout feature/login)"
+        accept:
+          - cmd: git
+            args: ["switch", "feature/login"]
+            label: git switch feature/login
+          - cmd: git
+            args: ["checkout", "feature/login"]
+            label: git checkout feature/login
+        hint: git switch feature/login
+    badge: brancher
+
+  - id: t2-l6
+    title: git merge — bring it home
+    tool: git
+    world: git
+    intro: |
+      When feature work is done, you MERGE it back:
+
+        git switch main       go to the destination branch
+        git merge <branch>    pull that branch's work in
+
+      This repo has a finished feature branch waiting.
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+    exercises:
+      - id: ex1
+        prompt: "Create and switch to a feature branch in one step: git checkout -b feature/buttons"
+        accept:
+          - cmd: git
+            args: ["checkout", "-b", "feature/buttons"]
+            label: git checkout -b feature/buttons
+          - cmd: git
+            args: ["switch", "-c", "feature/buttons"]
+            label: git switch -c feature/buttons
+        hint: git checkout -b feature/buttons
+      - id: ex2
+        prompt: "Stage and commit a change so the branch has work on it — git add . then commit with -m"
+        accept:
+          - cmd: git
+            args: ["add", "."]
+            label: git add .
+          - cmd: git
+            args: ["commit", "*"]
+            flags: [["-m"]]
+            canonical: "git add . && git commit -m msg"
+            label: git commit -m "..."
+        hint: git add . then git commit -m "add buttons"
+      - id: ex3
+        prompt: "If you committed — go back to main: git switch main"
+        accept:
+          - cmd: git
+            args: ["switch", "main"]
+            label: git switch main
+          - cmd: git
+            args: ["checkout", "main"]
+            label: git checkout main
+        hint: git switch main
+      - id: ex4
+        prompt: "Now merge the feature in: git merge feature/buttons"
+        accept:
+          - cmd: git
+            args: ["merge", "feature/buttons"]
+            label: git merge feature/buttons
+        hint: git merge feature/buttons
+    badge: merger
+
+  - id: t2-l7
+    title: git remote — push to the world
+    tool: git
+    world: git
+    intro: |
+      Remotes are copies of your repo on other machines (like GitHub).
+
+        git remote add origin <url>   connect a remote
+        git push -u origin main       upload your commits
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+    exercises:
+      - id: ex1
+        prompt: "Commit your work first — git add . then git commit -m \"...\""
+        accept:
+          - cmd: git
+            args: ["commit", "*"]
+            flags: [["-m"]]
+            canonical: "git add . && git commit -m msg"
+            label: git commit -m "..."
+        hint: git add . then git commit -m "first commit"
+      - id: ex2
+        prompt: "Connect a remote called origin: git remote add origin git@github.com:you/project.git"
+        accept:
+          - cmd: git
+            args: ["remote", "add", "origin", "*"]
+            label: git remote add origin <url>
+        tips:
+          "cmd:git sub:remote sub:add": "you need all three parts: git remote add <name> <url>"
+        hint: git remote add origin git@github.com:you/project.git
+      - id: ex3
+        prompt: "Push your work: git push -u origin main"
+        accept:
+          - cmd: git
+            args: ["push"]
+            canonical: "git push"
+            label: git push -u origin main
+          - cmd: git
+            args: ["push", "-u", "origin", "main"]
+            label: git push -u origin main
+        hint: git push -u origin main
+    badge: publisher
+
+  - id: t2-l8
+    title: BOSS — Ship a feature
+    tool: git
+    world: git
+    boss: true
+    intro: |
+      BOSS FIGHT: the full git workflow, no training wheels.
+
+      1. branch feature/copy
+      2. stage + commit work on it
+      3. switch back to main
+      4. merge the feature
+      5. push to origin
+
+      The repo already has a remote configured and modified files.
+    seed:
+      - op: gitInit
+      - op: gitModify
+        path: README.md
+      - op: gitRemote
+        name: origin
+    exercises:
+      - id: ex1
+        prompt: "Step 1 — create and switch to feature/copy"
+        accept:
+          - cmd: git
+            args: ["checkout", "-b", "feature/copy"]
+            label: git checkout -b feature/copy
+          - cmd: git
+            args: ["switch", "-c", "feature/copy"]
+            label: git switch -c feature/copy
+        hint: git checkout -b feature/copy
+      - id: ex2
+        prompt: "Step 2 — stage everything and commit with a message"
+        accept:
+          - cmd: git
+            args: ["commit", "*"]
+            flags: [["-m"]]
+            canonical: "git add . && git commit -m msg"
+            label: git commit -m "..."
+        tips:
+          "cmd:git sub:commit": stage first with git add . — then commit with -m.
+        hint: git add . && git commit -m "update copy"
+      - id: ex3
+        prompt: "Step 3 — back to main"
+        accept:
+          - cmd: git
+            args: ["switch", "main"]
+            label: git switch main
+          - cmd: git
+            args: ["checkout", "main"]
+            label: git checkout main
+        hint: git switch main
+      - id: ex4
+        prompt: "Step 4 — merge feature/copy into main"
+        accept:
+          - cmd: git
+            args: ["merge", "feature/copy"]
+            label: git merge feature/copy
+        hint: git merge feature/copy
+      - id: ex5
+        prompt: "Step 5 — push it"
+        accept:
+          - cmd: git
+            args: ["push"]
+            canonical: "git push"
+            label: git push
+        hint: git push
+    badge: feature-shipper
+
+  - id: t2-l9
+    title: grep — find anything
+    tool: grep
+    world: fs
+    intro: |
+      grep searches text inside files.
+
+        grep "error" log.txt     find lines containing "error"
+        grep -i                  case-insensitive
+        grep -n                  show line numbers
+
+      Pattern first, file second. The pattern is case-sensitive by default!
+    seed:
+      - op: write
+        name: server.log
+        content: |
+          INFO server started
+          ERROR failed to connect to database
+          INFO retrying...
+          error resolved after reboot
+          INFO all systems go
+    exercises:
+      - id: ex1
+        prompt: "Search server.log for ERROR — capital letters matter: grep ERROR server.log"
+        accept:
+          - cmd: grep
+            args: ["ERROR", "server.log"]
+            label: grep ERROR server.log
+        tips:
+          "cmd:grep arg:server.log arg:ERROR": "order matters — grep PATTERN FILE: grep ERROR server.log"
+          "cmd:grep noarg:server.log": "give grep a pattern and a file: grep ERROR server.log"
+        hint: grep ERROR server.log
+      - id: ex2
+        prompt: "Now catch lowercase \"error\" too — case-insensitive: grep -i error server.log"
+        accept:
+          - cmd: grep
+            flags: [["-i"]]
+            args: ["error", "server.log"]
+            label: grep -i error server.log
+        hint: grep -i error server.log
+      - id: ex3
+        prompt: "Show line numbers with -n: grep -n INFO server.log"
+        accept:
+          - cmd: grep
+            flags: [["-n"]]
+            args: ["INFO", "server.log"]
+            label: grep -n INFO server.log
+        hint: grep -n INFO server.log
+    badge: searcher
+
+  - id: t2-l10
+    title: grep -r — search everything
+    tool: grep
+    world: fs
+    intro: |
+      Searching file by file is for beginners. grep -r searches a whole folder RECURSIVELY:
+
+        grep -r "TODO" .
+
+      The dot means "this folder and everything inside it".
+    seed:
+      - op: mkdir
+        name: src
+      - op: write
+        path: src
+        name: app.js
+        content: "const start = () => {\n  // TODO: add error handling\n  return true\n}"
+      - op: write
+        path: src
+        name: utils.js
+        content: "export const ready = true\n// TODO: remove after launch"
+    exercises:
+      - id: ex1
+        prompt: "Find every TODO in the whole src folder: grep -r TODO src"
+        accept:
+          - cmd: grep
+            flags: [["-r", "-R"]]
+            args: ["TODO", "src"]
+            label: grep -r TODO src
+        tips:
+          "cmd:grep arg:TODO noflag:-r": without -r, grep expects a single file. Add -r for recursive folder search.
+        hint: grep -r TODO src
+    badge: deep-searcher
+
+  - id: t2-l11
+    title: npm init — start a project
+    tool: npm
+    world: fs
+    intro: |
+      npm is the package manager for JavaScript. A project starts with:
+
+        npm init -y
+
+      The -y flag answers "yes" to every question and generates package.json —
+      the file that records your project's dependencies and scripts.
+    exercises:
+      - id: ex1
+        prompt: "Initialize a project: npm init -y"
+        accept:
+          - cmd: npm
+            args: ["init"]
+            label: npm init -y
+        tips:
+          "cmd:npm sub:install": packages later — first create package.json with npm init -y.
+        hint: npm init -y
+      - id: ex2
+        prompt: "package.json appeared! Inspect it: cat package.json"
+        accept:
+          - cmd: cat
+            args: ["package.json"]
+            label: cat package.json
+        hint: cat package.json
+    badge: project-spawner
+
+  - id: t2-l12
+    title: npm install — harness the ecosystem
+    tool: npm
+    world: fs
+    intro: |
+      Someone already solved your problem. Their code is a package:
+
+        npm install <package>       add a dependency
+        npm install                 install everything in package.json
+
+      Installing creates node_modules (the packages) and updates package.json.
+    seed:
+      - op: write
+        name: package.json
+        content: |
+          {
+            "name": "sandbox",
+            "version": "1.0.0",
+            "scripts": {
+              "test": "echo ok"
+            }
+          }
+    exercises:
+      - id: ex1
+        prompt: "Install the \"dayjs\" package: npm install dayjs"
+        accept:
+          - cmd: npm
+            args: ["install", "dayjs"]
+            label: npm install dayjs
+          - cmd: npm
+            args: ["i", "dayjs"]
+            label: npm i dayjs
+        tips:
+          "cmd:npm sub:add": npm add works too! But the classic spelling is npm install dayjs.
+        hint: npm install dayjs
+      - id: ex2
+        prompt: "Check package.json — dayjs should be in dependencies now."
+        accept:
+          - cmd: cat
+            args: ["package.json"]
+            label: cat package.json
+        hint: cat package.json
+    badge: dependency-wrangler
+
+  - id: t2-l13
+    title: npm run — scripts on demand
+    tool: npm
+    world: fs
+    intro: |
+      package.json can define SCRIPTS — shortcuts for tasks:
+
+        "scripts": { "dev": "next dev" }
+
+      Run them with npm run <name>. Two special ones skip the word "run":
+
+        npm test    = npm run test
+        npm start   = npm run start
+    seed:
+      - op: write
+        name: package.json
+        content: |
+          {
+          "name": "sandbox",
+          "scripts": {
+            "dev": "echo dev server running on :3000",
+            "test": "echo all 12 tests passed"
+          }
+          }
+    exercises:
+      - id: ex1
+        prompt: "Run the dev script: npm run dev"
+        accept:
+          - cmd: npm
+            args: ["run", "dev"]
+            label: npm run dev
+        hint: npm run dev
+      - id: ex2
+        prompt: "Tests are special — try npm test"
+        accept:
+          - cmd: npm
+            args: ["test"]
+            label: npm test
+        hint: npm test
+    badge: script-runner
+
+  - id: t2-l14
+    title: BOSS — The bug hunt
+    tool: grep
+    world: fs
+    boss: true
+    intro: |
+      BOSS FIGHT: A production incident! Users report login failures.
+
+      Somewhere in src/ there's a bug marker. Find it, read the context,
+      and report the file and line. You have grep, cat, and your wits.
+    seed:
+      - op: mkdir
+        name: src
+      - op: write
+        path: src
+        name: auth.js
+        content: "function login(user) {\n  // FIXME: token never refreshed — breaks sessions\n  return token\n}"
+      - op: write
+        path: src
+        name: api.js
+        content: "export const get = (url) => fetch(url)\n// TODO: add retries"
+      - op: write
+        path: src
+        name: ui.js
+        content: "const button = 'onclick handler missing'"
+    exercises:
+      - id: ex1
+        prompt: "Find the FIXME comment anywhere in src"
+        accept:
+          - cmd: grep
+            flags: [["-r", "-R"]]
+            args: ["FIXME", "src"]
+            label: grep -r FIXME src
+        hint: grep -r FIXME src
+      - id: ex2
+        prompt: "Get the line number too — add -n to your search"
+        accept:
+          - cmd: grep
+            flags: [["-r", "-R"], ["-n", "--line-number"]]
+            args: ["FIXME", "src"]
+            label: grep -rn FIXME src
+        hint: grep -rn FIXME src
+      - id: ex3
+        prompt: "Read the full file with the bug: cat src/auth.js"
+        accept:
+          - cmd: cat
+            args: ["src/auth.js"]
+            label: cat src/auth.js
+        hint: cat src/auth.js
+    badge: bug-hunter

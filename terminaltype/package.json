@@ -1,0 +1,38 @@
+{
+  "name": "terminaltype",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "content:gen": "node scripts/gen-content.mjs",
+    "predev": "npm run content:gen",
+    "dev": "next dev",
+    "prebuild": "npm run content:gen",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "pretest": "npm run content:gen",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "js-yaml": "^5.5.0",
+    "playwright": "^1.64.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
